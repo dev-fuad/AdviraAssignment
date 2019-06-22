@@ -47,7 +47,7 @@ type P = {
 
 const Navbar = ({ name, image }: P) => (
   <View style={styles.container}>
-    <StatusBar barStyle="dark-content" translucent />
+    <StatusBar barStyle="dark-content" backgroundColor="#0000" translucent />
     <Image style={styles.image} source={{ uri: image }} />
     <Text style={styles.title} numberOfLines={1}>
       {name}
