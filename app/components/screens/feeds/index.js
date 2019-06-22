@@ -1,56 +1,43 @@
 import React, { Component } from 'react';
 import { View, Text, FlatList, Image } from 'react-native';
+import { connect } from 'react-redux';
 
 import { styles, rowStyles } from './styles';
 import Navbar from '../../custom/Navbar';
 import { fetchRequest } from '../../../providers/apis';
+import { fetchAPI, fetchMoreAPI } from '../../../store/actions';
 
-class HomeScreen extends Component {
-  page = {
-    current: 1,
-    total: 1,
-  };
-  state = {
-    user: {
-      id: 3,
-      name: 'Kattie Pearson',
-      image: 'https://randomuser.me/api/portraits/women/50.jpg',
+type P = {
+  user: {
+    id: Number,
+    name: String,
+    image: String,
+  },
+  feeds: {
+    page: {
+      index: Number,
+      total: Number,
     },
-    feeds: [],
-    isLoading: false,
-  };
+    data: Array,
+    isLoading: Boolean,
+  },
+  fetchAPI: Function,
+  fetchMoreAPI: Function,
+};
 
+class HomeScreen extends Component<P> {
   componentDidMount() {
-    this.fetchData();
+    this.props.fetchAPI();
   }
 
-  fetchData = async () => {
-    const { user, feeds } = this.state;
-    try {
-      this.setState({ isLoading: true });
-      const feedsResponse = await fetchRequest({
-        user_id: user.id,
-        page: this.page.current,
-      });
-      this.page.total = feedsResponse.last_page;
-      const newArray = this.page.current === 1 ? feedsResponse.data : [...feeds, ...feedsResponse.data];
-      this.setState({ feeds: newArray, isLoading: false });
-    } catch (error) {
-      console.log('Errorred: ', error);
-      this.setState({ isLoading: false });
-    }
-  };
-
-  _refreshFeed = () => {
-    this.page.current = 1;
-    this.fetchData();
-  };
-
   loadMoreFeeds = () => {
-    if (!this.state.isLoading
-      && this.page.current < this.page.total) {
-      this.page.current++;
-      this.fetchData();
+    const {
+      feeds: { page, isLoading },
+      fetchMoreAPI: loadMore,
+    } = this.props;
+    console.log('loadMore? ', isLoading, page);
+    if (!isLoading && page.index < page.total) {
+      loadMore();
     }
   };
 
@@ -60,24 +47,31 @@ class HomeScreen extends Component {
         <Image style={rowStyles.image} source={{ uri: item.photo }} />
         <View style={rowStyles.titleContainer}>
           <Text style={rowStyles.title}>{item.title || ''}</Text>
-          <Text style={rowStyles.place}>{(item.restaurant || {}).place_name || ''}</Text>
+          <Text style={rowStyles.place}>
+            {(item.restaurant || {}).place_name || ''}
+          </Text>
         </View>
       </View>
       <View style={rowStyles.statusContainer}>
         <Text style={rowStyles.likes}>{`${item.total_likes || 0} likes`}</Text>
-        <Text style={rowStyles.comments}>{`${item.total_comments || 0} comments`}</Text>
+        <Text style={rowStyles.comments}>{`${item.total_comments ||
+          0} comments`}</Text>
       </View>
     </View>
   );
 
   render() {
-    const { user, feeds, isLoading } = this.state;
+    const {
+      user,
+      feeds: { data, isLoading },
+      fetchAPI: refreshFeed,
+    } = this.props;
     return (
       <View style={styles.container}>
         <Navbar {...user} />
         <FlatList
-          data={feeds}
-          onRefresh={this._refreshFeed}
+          data={data}
+          onRefresh={refreshFeed}
           refreshing={isLoading}
           keyExtractor={item => `${item.id}`}
           renderItem={this._renderPizza}
@@ -89,4 +83,17 @@ class HomeScreen extends Component {
   }
 }
 
-export default HomeScreen;
+const mapStateToProps = state => ({
+  feeds: state.feeds,
+  user: state.user,
+});
+
+const mapDispatchToProps = {
+  fetchAPI,
+  fetchMoreAPI,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HomeScreen);
