@@ -22,7 +22,7 @@ export const fetchRequest = async (params) => {
       if (response.success) {
         console.log('Res.Success: ', response);
         return response.meals;
-      } else if (response.message) {
+      } else if (response.message && response.message !== 'No meal found.') {
         Alert.alert(response.message);
         console.log('Res.Error: ', response);
         return [];

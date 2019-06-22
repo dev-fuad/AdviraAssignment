@@ -5,6 +5,15 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  emptyList: {
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyListText: {
+    color: '#888',
+    fontSize: 16,
+  },
 });
 
 export const rowStyles = StyleSheet.create({

@@ -41,6 +41,17 @@ class HomeScreen extends Component<P> {
     }
   };
 
+  _emptyComponent = () => {
+    const { feeds: { isLoading } } = this.props;
+    if (isLoading) {
+      return null;
+    } else {
+      return (
+        <Text style={styles.emptyListText}>No Meal!</Text>
+      );
+    }
+  }
+
   _renderPizza = ({ item }) => (
     <View>
       <View>
@@ -54,8 +65,9 @@ class HomeScreen extends Component<P> {
       </View>
       <View style={rowStyles.statusContainer}>
         <Text style={rowStyles.likes}>{`${item.total_likes || 0} likes`}</Text>
-        <Text style={rowStyles.comments}>{`${item.total_comments ||
-          0} comments`}</Text>
+        <Text style={rowStyles.comments}>
+          {`${item.total_comments || 0} comments`}
+        </Text>
       </View>
     </View>
   );
@@ -73,6 +85,9 @@ class HomeScreen extends Component<P> {
           data={data}
           onRefresh={refreshFeed}
           refreshing={isLoading}
+          style={styles.container}
+          contentContainerStyle={data.length === 0 ? styles.emptyList : { }}
+          ListEmptyComponent={this._emptyComponent()}
           keyExtractor={item => `${item.id}`}
           renderItem={this._renderPizza}
           onEndReached={this.loadMoreFeeds}

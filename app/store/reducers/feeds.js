@@ -12,7 +12,7 @@ const InitialState = {
 export default (state = InitialState, action) => {
   switch (action.type) {
     case FETCH_DATA:
-      if (!Array.isArray(action.data)) return state;
+      if (!Array.isArray(action.data)) return { ...state, isLoading: false };
       return {
         page: {
           index: action.current_page,
@@ -22,7 +22,7 @@ export default (state = InitialState, action) => {
         isLoading: false,
       };
     case FETCH_MORE:
-      if (!Array.isArray(action.data)) return state;
+      if (!Array.isArray(action.data)) return { ...state, isLoading: false };
       return {
         page: {
           index: action.current_page,
