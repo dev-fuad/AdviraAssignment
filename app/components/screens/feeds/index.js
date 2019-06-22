@@ -3,6 +3,7 @@ import { View, Text, FlatList, Image } from 'react-native';
 
 import { styles, rowStyles } from './styles';
 import Navbar from '../../custom/Navbar';
+import { fetchRequest } from '../../../providers/apis';
 
 class HomeScreen extends Component {
   state = {
@@ -22,6 +23,23 @@ class HomeScreen extends Component {
       total_likes: 1,
       total_comments: 0,
     }],
+  };
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = async () => {
+    const { user, feeds } = this.state;
+    try {
+      const feedsResponse = await fetchRequest({
+        user_id: user.id,
+        page: 1,
+      });
+      this.setState({ feeds: feedsResponse.data });
+    } catch (error) {
+      console.log('Errorred: ', error);
+    }
   };
 
   _renderPizza = ({ item }) => (
